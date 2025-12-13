@@ -2,29 +2,44 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>航空订票系统</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✈️ 航空订票系统</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>✈️ 航空订票系统</h1>
-    
-    <div class="controls">
-        <button onclick="loadFlights()">刷新航班列表</button>
-    </div>
+    <div class="container">
+        <h1>✈️ 航空订票系统</h1>
+        
+        <div class="user-info">
+            <span>👤 当前用户: <strong>testuser</strong></span>
+        </div>
+        
+        <div class="controls">
+            <button onclick="loadFlights()" class="btn-primary">🔄 刷新航班</button>
+            <button onclick="loadMyTickets()" class="btn-info">📋 我的订单</button>
+            <button onclick="cancelTicket()" class="btn-warning">❌ 退票</button>
+        </div>
 
-    <table border="1" id="flightTable">
-        <thead>
-            <tr>
-                <th>航班号</th>
-                <th>出发地</th>
-                <th>目的地</th>
-                <th>价格</th>
-                <th>操作</th>
-            </tr>
-        </thead>
-        <tbody>
+        <table id="flightTable">
+            <thead>
+                <tr>
+                    <th>航班号</th>
+                    <th>出发地</th>
+                    <th>目的地</th>
+                    <th>价格</th>
+                    <th>座位</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td colspan="6" style="text-align:center;">
+                        正在加载数据...
+                    </td>
+                </tr>
             </tbody>
-    </table>
+        </table>
+    </div>
 
     <script src="script.js"></script>
 </body>

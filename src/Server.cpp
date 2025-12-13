@@ -1,46 +1,179 @@
 #include "../include/Server.h"
+#include "../include/Flight.h"
+#include "../include/Ticket.h"
+#include "../include/User.h"
 #include <iostream>
-#include <string>
+#include <sstream>
+#include <ctime>
 
 AirTicketServer::AirTicketServer() {
+    // 启动时加载数据
+    db.loadAll();
     setupRoutes();
 }
 
 void AirTicketServer::run(int port) {
-    // 告诉服务器，如果浏览器请求 "/"，就返回 public 文件夹里的 index.html
-    // set_mount_point 相当于把 public 文件夹暴露给浏览器
-    auto ret = svr.set_mount_point("/", "./public"); 
+    // 挂载静态文件目录
+    auto ret = svr.set_mount_point("/", "./public");
     if (!ret) {
-        std::cout << "错误：找不到 public 文件夹！" << std::endl;
+        std::cout << "❌ 错误：找不到 public 文件夹！" << std::endl;
+        return;
     }
-
-    // 启动监听
+    
+    std::cout << "✅ public 文件夹加载成功" << std::endl;
+    std::cout << "🌐 服务器监听端口: " << port << std::endl;
+    
+    // 启动服务器
     svr.listen("0.0.0.0", port);
 }
 
 void AirTicketServer::setupRoutes() {
-    // API 1: 获取所有航班信息
-    // 当浏览器访问 /api/flights 时，执行这个函数
+    
+    // ========== API 1: 查询所有航班 ==========
     svr.Get("/api/flights", [this](const httplib::Request& req, httplib::Response& res) {
+        std::cout << "📡 收到请求: GET /api/flights" << std::endl;
         
-        // --- 模拟：这里应该调用 this->db.getAllFlights() ---
-        // 为了演示，我手动拼接一个 JSON 字符串。
-        // 在实际项目中，你会遍历你的 flight 列表拼接字符串。
-        std::string json_response = "[";
-        json_response += "{ \"id\": \"CA1001\", \"from\": \"Beijing\", \"to\": \"Shanghai\", \"price\": 1200 },";
-        json_response += "{ \"id\": \"MU2002\", \"from\": \"Guangzhou\", \"to\": \"Beijing\", \"price\": 1500 }";
-        json_response += "]";
-        // ------------------------------------------------
-
-        // 发回数据，告诉浏览器这是 JSON 格式
-        res.set_content(json_response, "application/json");
-        std::cout << "收到查询请求，已返回数据。" << std::endl;
+        auto flights = db.getAllFlights();
+        
+        // 构建 JSON 响应
+        std::ostringstream json;
+        json << "[";
+        for (size_t i = 0; i < flights.size(); ++i) {
+            const auto& f = flights[i];
+            json << "{"
+                 << "\"id\":\"" << f.getId() << "\","
+                 << "\"from\":\"" << f.getFrom() << "\","
+                 << "\"to\":\"" << f.getTo() << "\","
+                 << "\"price\":" << f.getPrice() << ","
+                 << "\"seats\":" << f.getAvailableSeats()
+                 << "}";
+            if (i < flights.size() - 1) json << ",";
+        }
+        json << "]";
+        
+        res.set_content(json.str(), "application/json");
+        std::cout << "✅ 返回 " << flights.size() << " 条航班数据" << std::endl;
     });
-
-    // API 2: 订票 (模拟)
-    svr.Post("/api/book", [](const httplib::Request& req, httplib::Response& res) {
-        // req.body 里面是前端发来的数据
-        std::cout << "收到订票请求: " << req.body << std::endl;
-        res.set_content("订票成功", "text/plain");
+    
+    // ========== API 2: 订票 ==========
+    svr.Post("/api/book", [this](const httplib::Request& req, httplib::Response& res) {
+        std::cout << "📡 收到请求: POST /api/book" << std::endl;
+        std::cout << "📦 请求体: " << req.body << std::endl;
+        
+        // 简单解析 JSON (手动方式)
+        // 实际项目建议使用 nlohmann/json 库
+        std::string flightId, username;
+        
+        // 提取 flightId
+        size_t pos1 = req.body.find("\"flightId\":\"") + 12;
+        size_t pos2 = req.body.find("\"", pos1);
+        flightId = req.body.substr(pos1, pos2 - pos1);
+        
+        // 提取 username
+        pos1 = req.body.find("\"username\":\"") + 12;
+        pos2 = req.body.find("\"", pos1);
+        username = req.body.substr(pos1, pos2 - pos1);
+        
+        // 查找航班
+        Flight* flight = db.findFlight(flightId);
+        if (!flight) {
+            res.status = 404;
+            res.set_content("{\"error\":\"航班不存在\"}", "application/json");
+            std::cout << "❌ 航班不存在: " << flightId << std::endl;
+            return;
+        }
+        
+        // 尝试订座
+        if (!flight->bookSeat()) {
+            res.status = 400;
+            res.set_content("{\"error\":\"没有座位了\"}", "application/json");
+            std::cout << "❌ 订座失败：无座位" << std::endl;
+            return;
+        }
+        
+        // 生成订票号
+        std::ostringstream ticketId;
+        ticketId << "T" << std::time(nullptr);
+        
+        // 创建订票记录
+        Ticket ticket(ticketId.str(), flightId, username, flight->getPrice());
+        db.addTicket(ticket);
+        db.saveFlights(); // 保存航班座位变化
+        
+        // 返回成功
+        std::ostringstream json;
+        json << "{"
+             << "\"success\":true,"
+             << "\"ticketId\":\"" << ticketId.str() << "\","
+             << "\"message\":\"订票成功\""
+             << "}";
+        
+        res.set_content(json.str(), "application/json");
+        std::cout << "✅ 订票成功: " << ticketId.str() << std::endl;
     });
+    
+    // ========== API 3: 查询我的订单 ==========
+    svr.Get("/api/tickets", [this](const httplib::Request& req, httplib::Response& res) {
+        std::cout << "📡 收到请求: GET /api/tickets" << std::endl;
+        
+        // 从查询参数获取用户名
+        std::string username = req.get_param_value("username");
+        if (username.empty()) {
+            res.status = 400;
+            res.set_content("{\"error\":\"缺少用户名\"}", "application/json");
+            return;
+        }
+        
+        auto tickets = db.getUserTickets(username);
+        
+        // 构建 JSON
+        std::ostringstream json;
+        json << "[";
+        for (size_t i = 0; i < tickets.size(); ++i) {
+            const auto& t = tickets[i];
+            json << "{"
+                 << "\"ticketId\":\"" << t.getTicketId() << "\","
+                 << "\"flightId\":\"" << t.getFlightId() << "\","
+                 << "\"price\":" << t.getPrice()
+                 << "}";
+            if (i < tickets.size() - 1) json << ",";
+        }
+        json << "]";
+        
+        res.set_content(json.str(), "application/json");
+        std::cout << "✅ 返回 " << tickets.size() << " 张票" << std::endl;
+    });
+    
+    // ========== API 4: 退票 ==========
+    svr.Post("/api/cancel", [this](const httplib::Request& req, httplib::Response& res) {
+        std::cout << "📡 收到请求: POST /api/cancel" << std::endl;
+        
+        // 提取 ticketId
+        size_t pos1 = req.body.find("\"ticketId\":\"") + 12;
+        size_t pos2 = req.body.find("\"", pos1);
+        std::string ticketId = req.body.substr(pos1, pos2 - pos1);
+        
+        Ticket* ticket = db.findTicket(ticketId);
+        if (!ticket || ticket->isCancelled()) {
+            res.status = 404;
+            res.set_content("{\"error\":\"订单不存在或已退票\"}", "application/json");
+            return;
+        }
+        
+        // 退座
+        Flight* flight = db.findFlight(ticket->getFlightId());
+        if (flight) {
+            flight->cancelSeat();
+        }
+        
+        // 标记为已退票
+        ticket->cancel();
+        db.saveTickets();
+        db.saveFlights();
+        
+        res.set_content("{\"success\":true,\"message\":\"退票成功\"}", "application/json");
+        std::cout << "✅ 退票成功: " << ticketId << std::endl;
+    });
+    
+    std::cout << "✅ API 路由注册完成" << std::endl;
 }

@@ -1,0 +1,6 @@
+CA1001|Beijing|Shanghai|1200|100
+CA1002|Shanghai|Guangzhou|1500|80
+MU2001|Beijing|Chengdu|1300|50
+MU2002|Guangzhou|Beijing|1400|60
+CZ3001|Shanghai|Shenzhen|900|120
+CZ3002|Chengdu|Hangzhou|1100|90

@@ -8,10 +8,10 @@
             "args": [
                 "-g",
                 "-std=c++17",
-                "-D_WIN32_WINNT=0x0A00", 
+                "-D_WIN32_WINNT=0x0A00",
                 "-I${workspaceFolder}/include",
                 "${workspaceFolder}/src/Flight.cpp",
-                "${workspaceFolder}/src/Ticket.cpp", 
+                "${workspaceFolder}/src/Ticket.cpp",
                 "${workspaceFolder}/src/User.cpp",
                 "${workspaceFolder}/src/Database.cpp",
                 "${workspaceFolder}/src/Server.cpp",
@@ -30,7 +30,13 @@
                 "focus": false,
                 "panel": "shared"
             },
-            "problemMatcher": ["$gcc"]
+            "problemMatcher": ["$gcc"],
+            "options": {
+                "shell": {
+                    "executable": "cmd.exe",
+                    "args": ["/d", "/c", "chcp 65001 >nul &&"]
+                }
+            }
         }
     ]
 }
