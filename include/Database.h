@@ -3,6 +3,9 @@
 
 #include <vector>
 #include <string>
+#include "Flight.h"
+#include "Ticket.h"
+#include "User.h"
 
 // 前置声明
 class Flight;

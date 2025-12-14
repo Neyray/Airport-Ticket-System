@@ -5,19 +5,33 @@
             "label": "build",
             "type": "shell",
             "command": "g++",
+            "options": {
+                // 【关键修改】设置工作目录为项目根目录
+                // 这样 g++ 运行时，后续参数可以使用相对路径
+                "cwd": "${workspaceFolder}",
+                "shell": {
+                    "executable": "cmd.exe",
+                    "args": [
+                        "/d",
+                        "/c",
+                        "chcp 65001 >nul &&"
+                    ]
+                }
+            },
             "args": [
                 "-g",
                 "-std=c++17",
                 "-D_WIN32_WINNT=0x0A00",
-                "-I${workspaceFolder}/include",
-                "${workspaceFolder}/src/Flight.cpp",
-                "${workspaceFolder}/src/Ticket.cpp",
-                "${workspaceFolder}/src/User.cpp",
-                "${workspaceFolder}/src/Database.cpp",
-                "${workspaceFolder}/src/Server.cpp",
-                "${workspaceFolder}/src/main.cpp",
+                // 【关键修改】全部改为相对路径，避免出现中文路径
+                "-Iinclude",
+                "src/Flight.cpp",
+                "src/Ticket.cpp",
+                "src/User.cpp",
+                "src/Database.cpp",
+                "src/Server.cpp",
+                "src/main.cpp",
                 "-o",
-                "${workspaceFolder}/build/AirTicketSystem.exe",
+                "build/AirTicketSystem.exe",
                 "-lws2_32"
             ],
             "group": {
@@ -30,13 +44,7 @@
                 "focus": false,
                 "panel": "shared"
             },
-            "problemMatcher": ["$gcc"],
-            "options": {
-                "shell": {
-                    "executable": "cmd.exe",
-                    "args": ["/d", "/c", "chcp 65001 >nul &&"]
-                }
-            }
+            "problemMatcher": ["$gcc"]
         }
     ]
 }
