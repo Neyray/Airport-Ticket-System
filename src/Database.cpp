@@ -1,7 +1,4 @@
 #include "../include/Database.h"
-#include "../include/Flight.h"
-#include "../include/Ticket.h"
-#include "../include/User.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -10,14 +7,12 @@ Database::Database() {
     std::cout << "[Database] 数据库对象已创建" << std::endl;
 }
 
-// 加载所有数据
 void Database::loadAll() {
     loadFlights();
     loadTickets();
     loadUsers();
 }
 
-// 保存所有数据
 void Database::saveAll() {
     saveFlights();
     saveTickets();
@@ -27,7 +22,7 @@ void Database::saveAll() {
 // === 航班管理 ===
 void Database::loadFlights() {
     flights_.clear();
-    std::ifstream file("data/flights.txt");
+    std::ifstream file("../data/flights.txt");  // ✅ 改为相对路径
     if (!file.is_open()) {
         std::cout << "[Database] 无法打开 flights.txt" << std::endl;
         return;
@@ -44,9 +39,8 @@ void Database::loadFlights() {
 }
 
 void Database::saveFlights() {
-    std::ofstream file("data/flights.txt");
+    std::ofstream file("../data/flights.txt");  // ✅
     if (!file.is_open()) return;
-    
     for (const auto& flight : flights_) {
         file << flight.toString() << "\n";
     }
@@ -74,7 +68,7 @@ void Database::addFlight(const Flight& flight) {
 // === 订票管理 ===
 void Database::loadTickets() {
     tickets_.clear();
-    std::ifstream file("data/tickets.txt");
+    std::ifstream file("../data/tickets.txt");  // ✅
     if (!file.is_open()) return;
     
     std::string line;
@@ -87,9 +81,8 @@ void Database::loadTickets() {
 }
 
 void Database::saveTickets() {
-    std::ofstream file("data/tickets.txt");
+    std::ofstream file("../data/tickets.txt");  // ✅
     if (!file.is_open()) return;
-    
     for (const auto& ticket : tickets_) {
         file << ticket.toString() << "\n";
     }
@@ -123,7 +116,7 @@ Ticket* Database::findTicket(const std::string& ticketId) {
 // === 用户管理 ===
 void Database::loadUsers() {
     users_.clear();
-    std::ifstream file("data/users.txt");
+    std::ifstream file("../data/users.txt");  // ✅
     if (!file.is_open()) return;
     
     std::string line;
@@ -136,9 +129,8 @@ void Database::loadUsers() {
 }
 
 void Database::saveUsers() {
-    std::ofstream file("data/users.txt");
+    std::ofstream file("../data/users.txt");  // ✅
     if (!file.is_open()) return;
-    
     for (const auto& user : users_) {
         file << user.toString() << "\n";
     }

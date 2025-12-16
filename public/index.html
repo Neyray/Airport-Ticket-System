@@ -4,20 +4,357 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>✈️ 航空订票系统</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* 登录/注册面板 */
+        .auth-panel {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .auth-panel h2 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .auth-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-login {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-register {
+            background: #f093fb;
+            color: white;
+        }
+
+        .auth-buttons button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        /* 主界面 */
+        .main-panel {
+            display: none;
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .user-info span {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .user-info strong {
+            color: #667eea;
+        }
+
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-logout:hover {
+            background: #c82333;
+        }
+
+        .search-panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-form input, .search-form select {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc !important;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-info {
+            background: #4facfe;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #f093fb;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tbody tr {
+            transition: background 0.2s ease;
+        }
+
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        tbody button {
+            padding: 8px 16px;
+            font-size: 13px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            color: #667eea;
+        }
+
+        .close {
+            font-size: 28px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
+    <!-- 登录/注册面板 -->
+    <div class="auth-panel" id="authPanel">
+        <h2>✈️ 航空订票系统</h2>
+        <div class="form-group">
+            <label>用户名</label>
+            <input type="text" id="authUsername" placeholder="请输入用户名">
+        </div>
+        <div class="form-group">
+            <label>密码</label>
+            <input type="password" id="authPassword" placeholder="请输入密码">
+        </div>
+        <div class="form-group" id="registerFields" style="display: none;">
+            <label>真实姓名</label>
+            <input type="text" id="authRealName" placeholder="请输入真实姓名">
+        </div>
+        <div class="form-group" id="registerFieldsIdCard" style="display: none;">
+            <label>身份证号</label>
+            <input type="text" id="authIdCard" placeholder="请输入身份证号">
+        </div>
+        <div class="auth-buttons">
+            <button class="btn-login" onclick="login()">登录</button>
+            <button class="btn-register" onclick="toggleRegister()">注册</button>
+        </div>
+    </div>
+
+    <!-- 主界面 -->
+    <div class="container main-panel" id="mainPanel">
         <h1>✈️ 航空订票系统</h1>
         
         <div class="user-info">
-            <span>👤 当前用户: <strong>testuser</strong></span>
+            <span>👤 当前用户: <strong id="currentUserDisplay"></strong></span>
+            <button class="btn-logout" onclick="logout()">退出登录</button>
+        </div>
+
+        <!-- 查询面板 -->
+        <div class="search-panel">
+            <h3 style="margin-bottom: 15px; color: #667eea;">🔍 航班查询</h3>
+            <div class="search-form">
+                <input type="text" id="searchFrom" placeholder="出发地">
+                <input type="text" id="searchTo" placeholder="目的地">
+                <button class="btn-primary" onclick="searchFlights()">搜索航班</button>
+                <button class="btn-info" onclick="loadFlights()">显示全部</button>
+            </div>
         </div>
         
         <div class="controls">
             <button onclick="loadFlights()" class="btn-primary">🔄 刷新航班</button>
             <button onclick="loadMyTickets()" class="btn-info">📋 我的订单</button>
-            <button onclick="cancelTicket()" class="btn-warning">❌ 退票</button>
+            <button onclick="showCancelModal()" class="btn-warning">❌ 退票</button>
         </div>
 
         <table id="flightTable">
@@ -34,13 +371,257 @@
             <tbody>
                 <tr>
                     <td colspan="6" style="text-align:center;">
-                        正在加载数据...
+                        请先登录...
                     </td>
                 </tr>
             </tbody>
         </table>
     </div>
 
-    <script src="script.js"></script>
+    <!-- 退票弹窗 -->
+    <div id="cancelModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>退票</h3>
+                <span class="close" onclick="closeCancelModal()">&times;</span>
+            </div>
+            <div class="form-group">
+                <label>订票号</label>
+                <input type="text" id="cancelTicketId" placeholder="请输入订票号">
+            </div>
+            <button class="btn-warning" style="width: 100%;" onclick="cancelTicket()">确认退票</button>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let isRegistering = false;
+
+        // 切换注册模式
+        function toggleRegister() {
+            isRegistering = !isRegistering;
+            document.getElementById('registerFields').style.display = isRegistering ? 'block' : 'none';
+            document.getElementById('registerFieldsIdCard').style.display = isRegistering ? 'block' : 'none';
+            document.querySelector('.btn-register').textContent = isRegistering ? '返回登录' : '注册';
+        }
+
+        // 登录
+        async function login() {
+            const username = document.getElementById('authUsername').value.trim();
+            const password = document.getElementById('authPassword').value.trim();
+
+            if (!username || !password) {
+                alert('请输入用户名和密码');
+                return;
+            }
+
+            if (isRegistering) {
+                const realName = document.getElementById('authRealName').value.trim();
+                const idCard = document.getElementById('authIdCard').value.trim();
+                
+                if (!realName || !idCard) {
+                    alert('请填写完整注册信息');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password, realName, idCard })
+                    });
+
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        alert('✅ 注册成功！请登录');
+                        toggleRegister();
+                    } else {
+                        alert('❌ ' + result.error);
+                    }
+                } catch (error) {
+                    alert('❌ 注册失败：' + error.message);
+                }
+            } else {
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+
+                    const result = await response.json();
+                    
+                    if (response.ok) {
+                        currentUser = username;
+                        document.getElementById('currentUserDisplay').textContent = username;
+                        document.getElementById('authPanel').style.display = 'none';
+                        document.getElementById('mainPanel').style.display = 'block';
+                        loadFlights();
+                    } else {
+                        alert('❌ ' + result.error);
+                    }
+                } catch (error) {
+                    alert('❌ 登录失败：' + error.message);
+                }
+            }
+        }
+
+        // 退出登录
+        function logout() {
+            currentUser = null;
+            document.getElementById('authPanel').style.display = 'block';
+            document.getElementById('mainPanel').style.display = 'none';
+            document.getElementById('authUsername').value = '';
+            document.getElementById('authPassword').value = '';
+        }
+
+        // 加载航班列表
+        async function loadFlights() {
+            try {
+                const response = await fetch('/api/flights');
+                const flights = await response.json();
+                displayFlights(flights);
+            } catch (error) {
+                console.error('获取航班失败:', error);
+                alert("❌ 无法连接到服务器！");
+            }
+        }
+
+        // 查询航班
+        async function searchFlights() {
+            const from = document.getElementById('searchFrom').value.trim();
+            const to = document.getElementById('searchTo').value.trim();
+
+            try {
+                let url = '/api/flights?';
+                if (from) url += 'from=' + encodeURIComponent(from) + '&';
+                if (to) url += 'to=' + encodeURIComponent(to);
+
+                const response = await fetch(url);
+                const flights = await response.json();
+                displayFlights(flights);
+            } catch (error) {
+                alert('❌ 查询失败');
+            }
+        }
+
+        // 显示航班列表
+        function displayFlights(flights) {
+            const tbody = document.querySelector('#flightTable tbody');
+            tbody.innerHTML = '';
+
+            if (flights.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">没有找到航班</td></tr>';
+                return;
+            }
+
+            flights.forEach(flight => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${flight.id}</td>
+                    <td>${flight.from}</td>
+                    <td>${flight.to}</td>
+                    <td>¥${flight.price}</td>
+                    <td>剩余 ${flight.seats} 座</td>
+                    <td>
+                        <button class="btn-success" onclick="book('${flight.id}')" 
+                                ${flight.seats === 0 ? 'disabled' : ''}>
+                            ${flight.seats === 0 ? '已售罄' : '订票'}
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 订票
+        async function book(flightId) {
+            if (!confirm(`确认订票 ${flightId} 吗？`)) return;
+
+            try {
+                const response = await fetch('/api/book', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ flightId, username: currentUser })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert(`✅ ${result.message}\n订票号: ${result.ticketId}`);
+                    loadFlights();
+                } else {
+                    alert(`❌ ${result.error}`);
+                }
+            } catch (error) {
+                alert("❌ 订票请求失败！");
+            }
+        }
+
+        // 查看我的订单
+        async function loadMyTickets() {
+            try {
+                const response = await fetch(`/api/tickets?username=${currentUser}`);
+                const tickets = await response.json();
+                
+                if (tickets.length === 0) {
+                    alert("你还没有订票记录");
+                    return;
+                }
+
+                let message = "📋 我的订单：\n\n";
+                tickets.forEach((ticket, index) => {
+                    message += `${index + 1}. 订票号: ${ticket.ticketId}\n`;
+                    message += `   航班号: ${ticket.flightId}\n`;
+                    message += `   价格: ¥${ticket.price}\n\n`;
+                });
+                
+                alert(message);
+            } catch (error) {
+                alert("❌ 无法获取订单！");
+            }
+        }
+
+        // 显示退票弹窗
+        function showCancelModal() {
+            document.getElementById('cancelModal').style.display = 'block';
+        }
+
+        // 关闭退票弹窗
+        function closeCancelModal() {
+            document.getElementById('cancelModal').style.display = 'none';
+            document.getElementById('cancelTicketId').value = '';
+        }
+
+        // 退票
+        async function cancelTicket() {
+            const ticketId = document.getElementById('cancelTicketId').value.trim();
+            if (!ticketId) {
+                alert('请输入订票号');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/cancel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ticketId })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert(`✅ ${result.message}`);
+                    closeCancelModal();
+                    loadFlights();
+                } else {
+                    alert(`❌ ${result.error}`);
+                }
+            } catch (error) {
+                alert("❌ 退票请求失败！");
+            }
+        }
+    </script>
 </body>
 </html>

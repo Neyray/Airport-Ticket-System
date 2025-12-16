@@ -1,4 +1,4 @@
-CA1001|Beijing|Shanghai|1200|100
+CA1001|Beijing|Shanghai|1200|99
 CA1002|Shanghai|Guangzhou|1500|80
 MU2001|Beijing|Chengdu|1300|50
 MU2002|Guangzhou|Beijing|1400|60
